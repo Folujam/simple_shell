@@ -1,0 +1,11 @@
+#include "stdio.h"
+
+/**
+  *main - prints shell string
+  *Return: int(0 on succes)
+  */
+int main(void)
+{
+	printf("This is a Simple shell");
+	return (0);
+}
