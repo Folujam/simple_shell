@@ -6,6 +6,6 @@
   */
 int main(void)
 {
-	printf("This is a Simple shell");
+	printf("This is a Simple shell\n");
 	return (0);
 }
