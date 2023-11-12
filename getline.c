@@ -10,7 +10,7 @@
  * Return: Return number of character read
  */
 
-ssize_t _getline(char **restrict lineptr, size_t *restrict n, FILE *restrict stream)
+ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 {
 	size_t i;
 	char c;
@@ -22,7 +22,7 @@ ssize_t _getline(char **restrict lineptr, size_t *restrict n, FILE *restrict str
 		{
 			n += 1;
 			*lineptr = realloc(*lineptr, *n);
-			if (*lineptr = NULL)
+			if ((*lineptr) == NULL)
 			{
 				perror("Allocation failed ");
 				return (-1);
