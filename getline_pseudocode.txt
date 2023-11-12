@@ -1,0 +1,31 @@
+Getline function Pseudocode
+
+
+ssize_t getline(char **restrict lineptr, size_t *restrict n,
+                       FILE *restrict stream);
+
+Restrict is there to tell the compiler that no other pointer will acess the lineptr
+
+lineptr this is a pointer to the buffer where the line is stored it is allocated dynamically 
+
+n: This is a pointer to the size of the buffer
+
+Stream: The input stream 
+
+Getline returns the number of characters read including the newline function and -1
+If memory is not enough it reallocates memory
+
+Process
+
+First i need the value of n to allocate memory
+Before that i will allocate memory with what has already been passed
+Then i will get the input and use a while loop to get n
+I would use getchar function to read from stdin
+{ss
+To use getc  function i need to store each character
+while reading it and at the same time i need to get n
+}
+To fix that issue i will declare another variable and copare the size to n if it is lower than n increase n and reallocate continue using a while loop
+also check for failure of thr allocation
+After reallocating assign what was read to the lineptr
+Then use n to allocate memory to line ptr
