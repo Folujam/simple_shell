@@ -12,15 +12,24 @@
 
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 {
-	size_t i;
-	char c;
+	size_t i, j, k;
+	char buffer[1024];
 
-	i = 0;
-	while ((c = getc(stream)) != EOF)
+	k = 0;
+	i = fread(buffer, sizeof(char), 1024, stream);
+	while ((i != -1))
 	{
-		if (i >= *n)
+		if (i < 1024)
 		{
-			n += 1;
+			if (feof(stream))
+				return (i);
+			if (ferror(stream))
+				exit(EXIT_FAILURE);
+		}
+		*n += i;
+		k += i;
+		if (*n == k)
+		{
 			*lineptr = realloc(*lineptr, *n);
 			if ((*lineptr) == NULL)
 			{
@@ -28,9 +37,12 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 				return (-1);
 			}
 		}
-		(*lineptr)[i] = c;
-		i++;
+		for (j = 0; j < i; j++)
+			*lineptr[j] = buffer[j];
+		k += i;
 	}
-	(*lineptr)[i + 1] = '\0';
-	return (i);
+	else
+		return (-1)
+	(*lineptr)[j + 1] = '\0';
+	return (k);
 }
