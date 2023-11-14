@@ -12,37 +12,44 @@
 
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 {
-	size_t i, j, k;
+	size_t i;
 	char buffer[1024];
 
-	k = 0;
-	i = fread(buffer, sizeof(char), 1024, stream);
-	while ((i != -1))
+
+	if (*lineptr == NULL || *n == 0)
 	{
-		if (i < 1024)
+		*n = 256;
+		*lineptr = malloc(*n);
+		if (*lineptr == NULL)
 		{
-			if (feof(stream))
-				return (i);
-			if (ferror(stream))
-				exit(EXIT_FAILURE);
+			perror("Allocation failed");
 		}
-		*n += i;
-		k += i;
-		if (*n == k)
-		{
-			*lineptr = realloc(*lineptr, *n);
-			if ((*lineptr) == NULL)
-			{
-				perror("Allocation failed ");
-				return (-1);
-			}
-		}
-		for (j = 0; j < i; j++)
-			*lineptr[j] = buffer[j];
-		k += i;
 	}
-	else
-		return (-1)
-	(*lineptr)[j + 1] = '\0';
-	return (k);
+
+	if (fgets(buffer, sizeof(buffer), stream) != NULL)
+	{
+		while (buffer[i] != '\n')
+		{
+			i++;
+		}
+	}
+	i += 1;
+	if (feof(stream))
+		return (-1);
+	if (ferror(stream))
+		exit(EXIT_FAILURE);
+	while (i >= *n)
+	{
+		*n += 128;
+		*lineptr = realloc(*lineptr, *n);
+	}
+	if ((*lineptr) == NULL)
+	{
+		perror("Allocation failed ");
+		return (-1);
+	}
+	strncpy(*lineptr, buffer, i);
+	i += 1;
+	(*lineptr)[i] = '\0';
+	return (i);
 }
