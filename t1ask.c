@@ -11,14 +11,8 @@ int main(void)
 	while (1)
 	{
 		command = get_comm();
-		if (command == NULL)/*if command fails, eof*/
-			break;
-		if (*command == 0)/*if user hits ENTER*/
-		{
-			freearr(command);
-			free(command);
+		if (command == NULL)/*if command fails, eof, hits ENTER*/
 			continue;
-		}
 		exec_comm(command);
 		free(command);
 	}
@@ -32,43 +26,37 @@ char **get_comm(void)
 {
 	size_t len = 0;
 	ssize_t read;
-	char *command = NULL, *token, **av;
-	int i;
+	char *command = NULL, *token, **av, **temp;
 
 	printf("$ ");
 	read = getline(&command, &len, stdin);
-	if (strcmp(command, "exit") == 0 || strcmp(command, "env") == 0)
-		enx(command);
 	if (read == -1)
 	{
 		if (feof(stdin) != 0)/*if not EOF*/
 		{
 			free(command);
-			return (NULL);
+			exit(EXIT_SUCCESS);
 		}
 		perror("getline");/*handles error*/
 		free(command);
-		exit(EXIT_SUCCESS);
+		return (NULL);
 	}
 	command[strcspn(command, "\n")] = 0;/*remove newline*/
+	if (command[0] == '\0')
+	{
+		free(command);
+		return (NULL);
+	}
 	token = strtok(command, "  \t");
 	av = malloc(sizeof(char *) * MAX_ARGS);
 	if (av == NULL)
 		exit(EXIT_FAILURE);
-	i = 0;
-	while (token != NULL)
-	{
-		if (i == MAX_ARGS)/*if cmd(line)args are more than allo space*/
-		{
-			perror("Token limit");
-			free(av);
-			return (NULL);
-		}
-		av[i] = token;
-		i++;
-		token = strtok(NULL, " ");
-	}
-	av[i] = NULL;/*null-termintes the array*/
+	temp = tokspace(token, av);
+	if (temp == NULL)
+		return (NULL);
+	av = temp;
+	if (strcmp(av[0], "exit") == 0 || strcmp(av[0], "env") == 0)
+		enx(av);
 	return (av);
 }
 /**
@@ -82,40 +70,39 @@ void exec_comm(char **av)
 	int status;
 	char *a;
 
-	a = tofork(&av);
+	if (av[0][0] == '/')
+		a = strdup(av[0]);
+	else
+		a = tofork(&av);
 	if (a == NULL)
 	{
 		printf("COMMAND NOT FOUND\n");
 		return;
 	}
+	child = fork();
+	if (child == -1)
+	{
+		perror("fork");
+		return;
+	}
+	if (child == 0)
+	{
+		if ((execve(a, av, environ)) == -1)
+		{
+			free(a);
+			perror("Execve");
+			exit(EXIT_FAILURE);
+		}
+	}
 	else
 	{
-		printf("%s\n", av[0]);
-		child = fork();
-		if (child == -1)
+		if ((wait(&status)) == -1)
 		{
-			perror("fork");
+			free(a);
+			perror("wait");
 			return;
 		}
-		if (child == 0)
-		{
-			if ((execve(a, av, environ)) == -1)
-			{
-				free(a);
-				perror("Execve");
-				exit(EXIT_FAILURE);
-			}
-		}
-		else
-		{
-			if ((wait(&status)) == -1)
-			{
-				free(a);
-				perror("wait");
-				return;
-			}
-			free(a);
-		}
+		free(a);
 	}
 }
 /**
@@ -142,21 +129,10 @@ char *tofork(char ***av)
 			strcat(cat, *av[0]);
 			if (access(cat, F_OK) == 0)/*checks access*/
 				return (cat);
+			free(cat);
 			stok = strtok(NULL, ":");
 		}
-		free(cat);
 		free(pen);
 	}
 	return (NULL);
-}
-/**
-  *freearr - frees arr of strptr'
-  *@comarr: arr of com with arg
-  */
-void freearr(char **comarr)
-{
-	int i;
-
-	for (i = 0; comarr[i] != NULL; i++)
-		free(comarr[i]);
 }
