@@ -8,8 +8,8 @@
 #include <stdlib.h>
 
 #define MAX_ARGS 100
+
 extern char **environ;
-void simsh(void);
 char **get_comm(void);
 void exec_comm(char **av);
 char *tofork(char ***av);
