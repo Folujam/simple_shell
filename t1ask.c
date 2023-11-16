@@ -68,7 +68,7 @@ void exec_comm(char **av)
 {
 	pid_t child;
 	int status;
-	char *a;
+	char *a, *envp[] = { NULL };
 
 	if (av[0][0] == '/')
 		a = strdup(av[0]);
@@ -87,7 +87,7 @@ void exec_comm(char **av)
 	}
 	if (child == 0)
 	{
-		if ((execve(a, av, environ)) == -1)
+		if ((execve(a, av, envp)) == -1)
 		{
 			free(a);
 			perror("Execve");
