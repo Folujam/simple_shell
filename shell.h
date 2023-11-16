@@ -15,11 +15,7 @@ void exec_comm(char **av);
 char *tofork(char ***av);
 void freearr(char **comarr);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
-<<<<<<< HEAD
-
-=======
 char **tokspace(char *token, char **av);
->>>>>>> d057124864be4c70b25b766c4af38bde2d422fe8
 extern char **environ;
 void enx(char **av);
 

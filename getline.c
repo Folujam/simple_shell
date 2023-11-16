@@ -1,6 +1,4 @@
 #include "shell.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 /**
  * _getline - Reads characters from the stream
